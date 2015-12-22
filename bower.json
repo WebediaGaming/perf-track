@@ -1,0 +1,22 @@
+{
+  "name": "perf-track",
+  "description": "Tiny JS perf tracker",
+  "main": "dist/index.js",
+  "authors": [
+    "Elie Rotenberg <elie@rotenberg.io>"
+  ],
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/WebediaGaming/perf-track",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "bluebird": "~3.1.1"
+  }
+}

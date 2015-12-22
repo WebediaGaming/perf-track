@@ -1,0 +1,5 @@
+node_modules
+bower_components
+*.pid
+*.lock
+npm-debug.log
