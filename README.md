@@ -9,7 +9,6 @@ Tiny dependency-free JS perf tracker.
 <script src='perfTrack.min.js'></script>
 <script>
   perfTrack({
-    ignoreVisibilityChange: false,
     frameDurationThreshold: 200,
     startAfter: 1000,
     bailOut: false,
