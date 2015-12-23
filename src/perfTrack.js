@@ -1,4 +1,16 @@
-(function(window) {
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+    // Register as an anonymous AMD module:
+    define(factory);
+  } else if (typeof exports === 'object') {
+    // Node/CommonJS:
+    module.exports = factory;
+  } else {
+    // Browser globals:
+    window.perfTrack = factory;
+  }
+}(function(window) {
   var vendors = ['ms', 'moz', 'webkit', 'o'];
   var _raf = 'RequestAnimationFrame';
   var _caf = 'CancelAnimationFrame';
@@ -20,7 +32,7 @@
     return;
   }
 
-  return window.perfTrack = function(opts, onSlowFrame) {
+  return function(opts, onSlowFrame) {
     var frameDurationThreshold = opts.frameDurationThreshold || 200;
     var startAfter = opts.startAfter || 1000;
     var ignoreVisibilityChange = opts.ignoreVisibilityChange || false;
@@ -99,4 +111,4 @@
 
     return stopTracking;
   }
-})(window)
+}(window)))
