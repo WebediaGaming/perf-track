@@ -1,102 +1,85 @@
-(function(window) {
+(function(root, f) {
+  if(typeof define === 'function' && define.amd) {
+    define([], f);
+    return;
+  }
+  if(typeof exports === 'object') {
+    module.exports = f();
+    return;
+  }
+  if(typeof root === 'object' && typeof root.perfTrack === 'undefined') {
+    root.perfTrack = f();
+  }
+})(this, function() {
+  var g = window || global;
   var vendors = ['ms', 'moz', 'webkit', 'o'];
   var _raf = 'RequestAnimationFrame';
   var _caf = 'CancelAnimationFrame';
   var _altCaf = 'CancelRequestAnimationFrame';
 
-  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-    window.requestAnimationFrame = window[vendors[x]+_raf];
-    window.cancelAnimationFrame = window[vendors[x]+_caf] || window[vendors[x]+_altCaf];
+  var cancelAnimationFrame = g.cancelAnimationFrame;
+  var requestAnimationFrame = g.requestAnimationFrame;
+
+  for(var x = 0; x < vendors.length && (!requestAnimationFrame || !cancelAnimationFrame); ++x) {
+    g.requestAnimationFrame = g[vendors[x]+_raf];
+    g.cancelAnimationFrame = g[vendors[x]+_caf] || g[vendors[x]+_altCaf];
   }
 
   if(
-    typeof window === 'undefined' ||
-    typeof window.performance === 'undefined' ||
-    typeof window.document === 'undefined' ||
-    typeof window.requestAnimationFrame !== 'function' ||
-    typeof window.cancelAnimationFrame !== 'function' ||
-    typeof window.perfTrack !== 'undefined'
+    typeof g === 'undefined' ||
+    typeof g.performance === 'undefined' ||
+    typeof g.document === 'undefined' ||
+    typeof g.requestAnimationFrame !== 'function' ||
+    typeof g.cancelAnimationFrame !== 'function'
   ) {
     return;
   }
 
-  return window.perfTrack = function(opts, onSlowFrame) {
+  var clearTimeout = g.clearTimeout;
+  var document = g.document;
+  var performance = g.performance;
+  var setTimeout = g.setTimeout;
+
+  function perfTrack(opts, onSlowFrame) {
     var frameDurationThreshold = opts.frameDurationThreshold || 200;
     var startAfter = opts.startAfter || 1000;
-    var ignoreVisibilityChange = opts.ignoreVisibilityChange || false;
     var bailOut = opts.bailOut || false;
 
-    var cancelAnimationFrame = window.cancelAnimationFrame;
-    var clearTimeout = window.clearTimeout;
-    var document = window.document;
-    var performance = window.performance;
-    var requestAnimationFrame = window.requestAnimationFrame;
-    var setTimeout = window.setTimeout;
-
-    var callbackHandler = null;
-    var stopped = false;
-    var startedOnce = false;
-
-    var initialTime = performance.now();
-    var prevFrame = initialTime;
+    var callbackHandle;
     var initialHandle = setTimeout(startMonitoring, startAfter);
+    var prevFrame;
 
-    function monitorFrame() {
-      var currFrame = performance.now();
+    function monitorFrame(currFrame) {
       var frameDuration = currFrame - prevFrame;
-      if(frameDuration > frameDurationThreshold) {
+      if(frameDuration > frameDurationThreshold && !document.hidden) {
         onSlowFrame(frameDuration);
         if(bailOut) {
-          return stopTracking();
+          return stopMonitoring();
         }
       }
       prevFrame = currFrame;
-      callbackHandler = requestAnimationFrame(monitorFrame);
+      callbackHandle = requestAnimationFrame(monitorFrame);
     }
 
     function startMonitoring() {
-      startedOnce = true;
-      if(callbackHandler) {
-        return;
-      }
       prevFrame = performance.now();
-      callbackHandler = requestAnimationFrame(monitorFrame);
+      initialHandle = null;
+      callbackHandle = requestAnimationFrame(monitorFrame);
     }
 
     function stopMonitoring() {
-      if(!callbackHandler) {
-        return;
+      if(initialHandle) {
+        clearTimeout(initialHandle);
+        initialHandle = null;
       }
-      cancelAnimationFrame(callbackHandler);
-      callbackHandler = null;
+      if(callbackHandle) {
+        cancelAnimationFrame(callbackHandle);
+        callbackHandle = null;
+      }
     }
 
-    function handleVisibilityChange() {
-      if(ignoreVisibilityChange) {
-        return;
-      }
-      if(document.hidden) {
-        return stopMonitoring();
-      }
-      if(startedOnce) {
-        return startMonitoring();
-      }
-      var now = performance.now();
-      clearTimeout(initialHandle);
-      initialHandle = setTimeout(startMonitoring, now - initialTime + startAfter);
-    }
-
-    function stopTracking() {
-      if(stopped) {
-        return;
-      }
-      stopped = true;
-      stopMonitoring();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return stopTracking;
+    return stopMonitoring;
   }
-})(window)
+
+  return perfTrack;
+});
