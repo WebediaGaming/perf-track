@@ -12,8 +12,10 @@ Tiny dependency-free JS perf tracker.
     frameDurationThreshold: 200,
     startAfter: 1000,
     bailOut: false,
-  }, function(frameDuration) {
-    ga('send', 'perfTrack', 'slowFrame', window.location.href, frameDuration);
+  }, function(frameDuration, hidden) {
+    if(!hidden) {
+      ga('send', 'perfTrack', 'slowFrame', window.location.href, frameDuration);
+    }
   });
 </script>
 ```
