@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var karma = require('karma');
 var rename = require('gulp-rename');
+var runSequence = require('run-sequence');
 var uglify = require('gulp-uglify');
 var rimraf = require('rimraf');
 
@@ -53,6 +54,8 @@ gulp.task('test-dist', ['build'], function(done) {
   }).start();
 });
 
-gulp.task('test', ['test-src', 'test-dist']);
+gulp.task('test', function(cb) {
+  runSequence('test-src', 'test-dist', cb);
+});
 
 gulp.task('default', ['test']);
