@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WebediaGaming/perf-track.git"
+    "url": "git+https://github.com/elierotenberg/perf-track.git"
   },
   "author": "Elie Rotenberg <elie@rotenberg.io>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/WebediaGaming/perf-track/issues"
+    "url": "https://github.com/elierotenberg/perf-track/issues"
   },
-  "homepage": "https://github.com/WebediaGaming/perf-track#readme",
+  "homepage": "https://github.com/elierotenberg/perf-track#readme",
   "devDependencies": {
     "chai": "^3.4.1",
     "gulp": "^3.9.0",

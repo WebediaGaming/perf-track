@@ -1,7 +1,7 @@
 perf-track
 ==========
 
-Tiny dependency-free JS perf tracker.
+Tiny (<1kb before gzip) dependency-free JS perf tracker.
 
 ### Usage
 
